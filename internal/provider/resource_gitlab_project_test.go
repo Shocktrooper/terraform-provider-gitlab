@@ -32,9 +32,21 @@ func TestAccGitlabProject_minimal(t *testing.T) {
 			{
 				Config: fmt.Sprintf(`
 					resource "gitlab_project" "this" {
-						name = "foo-%d"
-						visibility_level = "public"
-					}`, rInt),
+						name                   = "foo-%d"
+						visibility_level       = "private"
+						description            = "test"
+						default_branch         = "prod"
+						initialize_with_readme = true
+						namespace_id           = gitlab_group.this.id
+					}
+
+					resource "gitlab_group" "this" {
+						name                      = "foo-%d"
+						path                      = "path-%d"
+						visibility_level          = "internal"
+						default_branch_protection = 0
+					}
+					`, rInt, rInt, rInt),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckGitlabProjectExists("gitlab_project.this", &received),
 				),
